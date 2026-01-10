@@ -1,16 +1,18 @@
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
+using TaskManager.Infrastructure.Persistence;
 
 var builder = WebApplication.CreateBuilder(args);
 
 var jwtSettings = builder.Configuration.GetSection("Jwt");
 
-//builder.Services.AddDbContext<AppDbContext>(options =>
-//options.UseNpgsql(
-//    builder.Configuration.GetConnectionString("TaskManager")
-//    )
-//);
+builder.Services.AddDbContext<AppDbContext>(options =>
+options.UseNpgsql(
+    builder.Configuration.GetConnectionString("TaskManager")
+    )
+);
 
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     .AddJwtBearer(options =>
