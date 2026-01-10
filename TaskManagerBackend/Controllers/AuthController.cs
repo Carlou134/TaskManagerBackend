@@ -1,31 +1,53 @@
-﻿using Microsoft.AspNetCore.Mvc;
-using TaskManager.Application.Auth.Dtos;
-using TaskManager.Application.Auth.Interfaces;
+﻿using MediatR;
+using Microsoft.AspNetCore.Mvc;
+using TaskManager.Application.Auth.Commands.Login;
 
 namespace TaskManager.Api.Controllers
 {
-    [Route("api/login")]
+    [Route("api/auth")]
     [ApiController]
     public class AuthController : ControllerBase
     {
-        private readonly IAuthService _authService;
+        private readonly IMediator _mediator;
+        private readonly ILogger<AuthController> _logger;
 
-        public AuthController(IAuthService authService)
+        public AuthController(IMediator mediator, ILogger<AuthController> logger)
         {
-            _authService = authService!;
+            _mediator = mediator;
+            _logger = logger;
         }
 
-        [HttpPost("/authenticate")]
-        public async Task<ActionResult> Authenticate([FromBody] LoginRequestDto request)
+        [HttpPost("login")]
+        public async Task<ActionResult> Authenticate([FromBody] LoginCommand command, CancellationToken cancellationToken)
         {
             try
             {
-                CancellationTokenSource tokenSource = new CancellationTokenSource();
-                return Ok(await _authService.Login(request, tokenSource.Token).ConfigureAwait(false));
+                var token = await _mediator.Send(command, cancellationToken);
+                return Ok(token);
+            }
+            catch (InvalidOperationException ex)
+            {
+                _logger.LogWarning(ex, "Validation error: {Username}", command.UserName);
+                return BadRequest(new
+                {
+                    Message = ex.Message,
+                });
+            }
+            catch (UnauthorizedAccessException ex)
+            {
+                _logger.LogWarning(ex, "Failed login attempt: {Username}", command.UserName);
+                return Unauthorized(new
+                {
+                    Message = ex.Message,
+                });
             }
             catch (Exception ex)
             {
-                return BadRequest(ex.Message);
+                _logger.LogError(ex, "Unexpected error during login: {Username}", command.UserName);
+                return StatusCode(500, new
+                {
+                    Message = "Unexpected server error"
+                });
             }
         }
     }

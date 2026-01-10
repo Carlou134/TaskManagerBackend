@@ -2,11 +2,8 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
-using TaskManager.Api.Services;
-using TaskManager.Application.Auth.Interfaces;
-using TaskManager.Application.Auth.Services;
-using TaskManager.Application.Mappings;
-using TaskManager.Application.Users.Interfaces;
+using TaskManager.Application.Common.Mappings;
+using TaskManager.Application.Users.Commands.CreateUser;
 using TaskManager.Application.Users.Queries;
 using TaskManager.Infrastructure.Persistence;
 
@@ -41,9 +38,13 @@ builder.Services.AddAutoMapper(cfg =>
     cfg.AddProfile<UserMappingProfile>();
     cfg.AddMaps(typeof(UserMappingProfile).Assembly);
 });
+
+builder.Services.AddMediatR(cfg =>
+{
+    cfg.RegisterServicesFromAssembly(typeof(UserCreateCommand).Assembly);
+});
+
 builder.Services.AddScoped<IUserQueryService, UserQueryService>();
-builder.Services.AddScoped<IJwtTokenService, JwtTokenService>();
-builder.Services.AddScoped<IAuthService, AuthService>();
 
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();

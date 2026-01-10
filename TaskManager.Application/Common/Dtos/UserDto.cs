@@ -1,4 +1,4 @@
-﻿namespace TaskManager.Application.Users.Dtos
+﻿namespace TaskManager.Application.Common.Dtos
 {
     public class UserDto
     {

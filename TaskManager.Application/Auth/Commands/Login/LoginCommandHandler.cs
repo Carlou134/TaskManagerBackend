@@ -1,25 +1,28 @@
-﻿using Microsoft.Extensions.Configuration;
+﻿using MediatR;
+using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
-using TaskManager.Application.Auth.Dtos;
-using TaskManager.Application.Auth.Interfaces;
-using TaskManager.Application.Users.Dtos;
+using TaskManager.Application.Users.Queries;
 
-namespace TaskManager.Application.Auth.Services
+namespace TaskManager.Application.Auth.Commands.Login
 {
-    public class JwtTokenService : IJwtTokenService
+    public class LoginCommandHandler : IRequestHandler<LoginCommand, AuthResponse>
     {
         private readonly IConfiguration _configuration;
+        private readonly IUserQueryService _userQueryService;
 
-        public JwtTokenService(IConfiguration configuration)
+        public LoginCommandHandler(IConfiguration configuration, IUserQueryService userQueryService) 
         {
             _configuration = configuration;
+            _userQueryService = userQueryService;
         }
 
-        public AuthResponseDto GenerateToken(UserDto user)
+        public async Task<AuthResponse> Handle(LoginCommand request, CancellationToken cancellationToken)
         {
+            var user = await _userQueryService.GetUser(request, cancellationToken);
+
             var jwt = _configuration.GetSection("Jwt");
             int expireMinutes = int.Parse(jwt["ExpireMinutes"]!);
 
@@ -46,7 +49,7 @@ namespace TaskManager.Application.Auth.Services
                 signingCredentials: creds
                 );
 
-            return new AuthResponseDto
+            return new AuthResponse
             {
                 Token = new JwtSecurityTokenHandler().WriteToken(token),
                 ExpireMinutes = expireMinutes

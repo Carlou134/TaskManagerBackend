@@ -7,21 +7,19 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Folder Include="Auth\Comands\" />
-    <Folder Include="Auth\Queries\" />
-    <Folder Include="Users\Commands\" />
-    <Folder Include="Users\Services\" />
-  </ItemGroup>
-
-  <ItemGroup>
     <PackageReference Include="AutoMapper" Version="16.0.0" />
     <PackageReference Include="BCrypt.Net-Next" Version="4.0.3" />
+    <PackageReference Include="MediatR" Version="14.0.0" />
     <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="8.0.22" />
   </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\TaskManager.Domain\TaskManager.Domain.csproj" />
 	<ProjectReference Include="..\TaskManager.Infrastructure\TaskManager.Infrastructure.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Auth\Commands\Queries\" />
   </ItemGroup>
 
 </Project>

@@ -1,13 +1,17 @@
 ﻿using AutoMapper;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
-using TaskManager.Application.Auth.Dtos;
-using TaskManager.Application.Users.Dtos;
-using TaskManager.Application.Users.Interfaces;
+using TaskManager.Application.Auth.Commands.Login;
+using TaskManager.Application.Common.Dtos;
 using TaskManager.Infrastructure.Persistence;
 
 namespace TaskManager.Application.Users.Queries
 {
+    public interface IUserQueryService
+    {
+        Task<UserDto> GetUser(LoginCommand command, CancellationToken cancellationToken);
+    }
+
     public class UserQueryService : IUserQueryService
     {
         private readonly AppDbContext _context;
@@ -20,36 +24,27 @@ namespace TaskManager.Application.Users.Queries
             ILogger<UserQueryService> logger
             )
         {
-            _context = context!;
-            _mapper = mapper!;
-            _logger = logger!;
+            _context = context;
+            _mapper = mapper;
+            _logger = logger;
         }
 
-        public async Task<UserDto> GetUser(LoginRequestDto request, CancellationToken cancellationToken)
+        public async Task<UserDto> GetUser(LoginCommand command, CancellationToken cancellationToken)
         {
-            try
+            var user = await _context.User.AsNoTracking()
+                    .FirstOrDefaultAsync(x => command.UserName == x.Name, cancellationToken);
+
+            if (user == null)
             {
-                var user = await _context.User.AsNoTracking()
-                    .FirstOrDefaultAsync(x => request.UserName == x.Name, cancellationToken)
-                    .ConfigureAwait(false);
-
-                if (user == null)
-                {
-                    throw new ArgumentNullException("Usuario no encontrado");
-                }
-
-                if (!BCrypt.Net.BCrypt.Verify(request.Password, user.PasswordHash))
-                {
-                    throw new UnauthorizedAccessException("La contraseña no es correcta.");
-                }
-
-                return _mapper.Map<UserDto>(user);
+                throw new UnauthorizedAccessException("Invalid credentials");
             }
-            catch (Exception ex)
+
+            if (!BCrypt.Net.BCrypt.Verify(command.Password, user.PasswordHash))
             {
-                _logger.LogError(ex, $"Error al autenticar usuario: {ex.Message}", request);
-                throw;
+                throw new UnauthorizedAccessException("The password isn't correct.");
             }
+
+            return _mapper.Map<UserDto>(user);
         }
     }
 }

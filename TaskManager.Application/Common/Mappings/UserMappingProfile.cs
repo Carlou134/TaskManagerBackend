@@ -1,8 +1,8 @@
 ﻿using AutoMapper;
-using TaskManager.Application.Users.Dtos;
+using TaskManager.Application.Common.Dtos;
 using TaskManager.Domain;
 
-namespace TaskManager.Application.Mappings
+namespace TaskManager.Application.Common.Mappings
 {
     public class UserMappingProfile : Profile
     {
