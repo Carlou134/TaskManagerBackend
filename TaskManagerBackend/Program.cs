@@ -2,6 +2,11 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
+using TaskManager.Api.Services;
+using TaskManager.Application.Auth.Interfaces;
+using TaskManager.Application.Auth.Queries;
+using TaskManager.Application.Auth.Services;
+using TaskManager.Application.Mappings;
 using TaskManager.Infrastructure.Persistence;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -29,6 +34,15 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
             IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtSettings["key"]!))
         };
     });
+
+builder.Services.AddAutoMapper(cfg =>
+{
+    cfg.AddProfile<UserMappingProfile>();
+    cfg.AddMaps(typeof(UserMappingProfile).Assembly);
+});
+builder.Services.AddScoped<IUserQueryService, UserQueryService>();
+builder.Services.AddScoped<IJwtTokenService, JwtTokenService>();
+builder.Services.AddScoped<IAuthService, AuthService>();
 
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
