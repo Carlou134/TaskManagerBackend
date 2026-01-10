@@ -2,10 +2,11 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using TaskManager.Application.Auth.Dtos;
-using TaskManager.Application.Auth.Interfaces;
+using TaskManager.Application.Users.Dtos;
+using TaskManager.Application.Users.Interfaces;
 using TaskManager.Infrastructure.Persistence;
 
-namespace TaskManager.Application.Auth.Queries
+namespace TaskManager.Application.Users.Queries
 {
     public class UserQueryService : IUserQueryService
     {

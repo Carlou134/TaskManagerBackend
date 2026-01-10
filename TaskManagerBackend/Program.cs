@@ -4,9 +4,10 @@ using Microsoft.IdentityModel.Tokens;
 using System.Text;
 using TaskManager.Api.Services;
 using TaskManager.Application.Auth.Interfaces;
-using TaskManager.Application.Auth.Queries;
 using TaskManager.Application.Auth.Services;
 using TaskManager.Application.Mappings;
+using TaskManager.Application.Users.Interfaces;
+using TaskManager.Application.Users.Queries;
 using TaskManager.Infrastructure.Persistence;
 
 var builder = WebApplication.CreateBuilder(args);

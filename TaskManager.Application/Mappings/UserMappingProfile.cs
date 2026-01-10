@@ -1,5 +1,5 @@
 ﻿using AutoMapper;
-using TaskManager.Application.Auth.Dtos;
+using TaskManager.Application.Users.Dtos;
 using TaskManager.Domain;
 
 namespace TaskManager.Application.Mappings

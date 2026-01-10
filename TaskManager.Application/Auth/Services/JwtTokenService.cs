@@ -5,6 +5,7 @@ using System.Security.Claims;
 using System.Text;
 using TaskManager.Application.Auth.Dtos;
 using TaskManager.Application.Auth.Interfaces;
+using TaskManager.Application.Users.Dtos;
 
 namespace TaskManager.Application.Auth.Services
 {

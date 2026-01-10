@@ -1,5 +1,6 @@
 ﻿using TaskManager.Application.Auth.Dtos;
 using TaskManager.Application.Auth.Interfaces;
+using TaskManager.Application.Users.Interfaces;
 
 namespace TaskManager.Api.Services
 {
