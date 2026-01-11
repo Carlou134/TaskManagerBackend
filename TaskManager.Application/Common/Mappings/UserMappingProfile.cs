@@ -8,7 +8,11 @@ namespace TaskManager.Application.Common.Mappings
     {
         public UserMappingProfile()
         {
-            CreateMap<User, UserDto>();
+            CreateMap<User, UserDto>()
+                .ForMember(
+                dest => dest.RoleName,
+                opt => opt.MapFrom(src => src.Role.Name)
+                );
         }
     }
 }

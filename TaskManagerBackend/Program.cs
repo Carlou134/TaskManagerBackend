@@ -3,6 +3,8 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
 using TaskManager.Application.Common.Mappings;
+using TaskManager.Application.Tasks.Commands.CreateTask;
+using TaskManager.Application.Tasks.Queries;
 using TaskManager.Application.Users.Commands.CreateUser;
 using TaskManager.Application.Users.Queries;
 using TaskManager.Infrastructure.Persistence;
@@ -36,15 +38,19 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
 builder.Services.AddAutoMapper(cfg =>
 {
     cfg.AddProfile<UserMappingProfile>();
+    cfg.AddProfile<TaskMappingProfile>();
     cfg.AddMaps(typeof(UserMappingProfile).Assembly);
+    cfg.AddMaps(typeof(TaskMappingProfile).Assembly);
 });
 
 builder.Services.AddMediatR(cfg =>
 {
     cfg.RegisterServicesFromAssembly(typeof(UserCreateCommand).Assembly);
+    cfg.RegisterServicesFromAssembly(typeof(TaskCreateCommand).Assembly);
 });
 
 builder.Services.AddScoped<IUserQueryService, UserQueryService>();
+builder.Services.AddScoped<ITaskQueryService, TaskQueryService>();
 
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();

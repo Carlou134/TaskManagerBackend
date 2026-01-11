@@ -12,8 +12,6 @@ namespace TaskManager.Infrastructure.Persistence.Configurations
             builder.HasKey(x => x.Id);
             builder.Property(x => x.Id).ValueGeneratedOnAdd();
 
-            builder.HasMany(x => x.Users).WithOne(x => x.Role).HasForeignKey(x => x.RoleId);
-
             builder.HasData(
                 new Role { Id = 1, Name = "USER" },
                 new Role { Id = 2, Name = "ADMIN" }

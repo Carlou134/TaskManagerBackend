@@ -20,6 +20,8 @@
 
   <ItemGroup>
     <Folder Include="Auth\Commands\Queries\" />
+    <Folder Include="Tasks\Commands\DeleteTask\" />
+    <Folder Include="Tasks\Commands\UpdateTask\" />
   </ItemGroup>
 
 </Project>

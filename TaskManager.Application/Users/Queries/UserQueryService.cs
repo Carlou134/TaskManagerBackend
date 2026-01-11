@@ -16,22 +16,18 @@ namespace TaskManager.Application.Users.Queries
     {
         private readonly AppDbContext _context;
         private readonly IMapper _mapper;
-        private readonly ILogger<UserQueryService> _logger;
 
         public UserQueryService(
             AppDbContext context, 
-            IMapper mapper,
-            ILogger<UserQueryService> logger
-            )
+            IMapper mapper)
         {
             _context = context;
             _mapper = mapper;
-            _logger = logger;
         }
 
         public async Task<UserDto> GetUser(LoginCommand command, CancellationToken cancellationToken)
         {
-            var user = await _context.User.AsNoTracking()
+            var user = await _context.User.AsNoTracking().Include(x => x.Role)
                     .FirstOrDefaultAsync(x => command.UserName == x.Name, cancellationToken);
 
             if (user == null)
