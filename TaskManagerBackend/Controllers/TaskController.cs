@@ -31,8 +31,7 @@ namespace TaskManager.Api.Controllers
         {
             try
             {
-                var id = GetCurrentUserId();
-                return Ok(await _taskQueryService.GetAllTasks(id));
+                return Ok(await _taskQueryService.GetAllTasks(GetCurrentUserId()));
             }
             catch (Exception ex)
             {
