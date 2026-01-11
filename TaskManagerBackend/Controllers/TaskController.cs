@@ -4,8 +4,9 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
 using TaskManager.Application.Tasks.Commands.CreateTask;
+using TaskManager.Application.Tasks.Commands.DeleteTask;
+using TaskManager.Application.Tasks.Commands.UpdateTask;
 using TaskManager.Application.Tasks.Queries;
-using TaskManager.Application.Users.Commands.CreateUser;
 
 namespace TaskManager.Api.Controllers
 {
@@ -36,7 +37,7 @@ namespace TaskManager.Api.Controllers
                     return Ok(await _taskQueryService.GetAllTasks(id));
                 }
 
-                return Unauthorized("No tiene acceso");
+                return Unauthorized("You don't have access");
             }
             catch (Exception ex)
             {
@@ -56,15 +57,87 @@ namespace TaskManager.Api.Controllers
             catch (InvalidOperationException ex)
             {
                 _logger.LogWarning(ex, "Validation error: {taskName}", command.Name);
-                return StatusCode(400, new UserCreateResponse
+                return StatusCode(400, new
                 {
                     Message = ex.Message
                 });
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error registering user: {Username}", command.Name);
-                return StatusCode(500, new UserCreateResponse
+                _logger.LogError(ex, "Error registering task: {taskName}", command.Name);
+                return StatusCode(500, new
+                {
+                    Message = "Unexpected server error"
+                });
+            }
+        }
+
+        [Authorize(Roles = "USER")]
+        [HttpPut("update")]
+        public async Task<ActionResult> UpdateTask([FromBody] TaskUpdateCommand command, CancellationToken token)
+        {
+            try
+            {
+                if(command.UserId != GetCurrentUserId())
+                {
+                    throw new UnauthorizedAccessException("You don't have access");
+                }
+
+                var result = await _mediator.Send(command, token);
+                return StatusCode(201, result);
+            }
+            catch (InvalidOperationException ex)
+            {
+                _logger.LogWarning(ex, "Validation error: {taskName}", command.Name);
+                return StatusCode(400, new
+                {
+                    Message = ex.Message
+                });
+            }
+            catch (UnauthorizedAccessException ex)
+            {
+                return Unauthorized(ex.Message);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error updating tasks: {taskName}", command.Name);
+                return StatusCode(500, new
+                {
+                    Message = "Unexpected server error"
+                });
+            }
+        }
+
+        [Authorize(Roles = "USER")]
+        [HttpDelete("delete")]
+        public async Task<ActionResult> DeleteTask([FromBody] TaskDeleteCommand command, CancellationToken token)
+        {
+            try
+            {
+                if (command.UserId != GetCurrentUserId())
+                {
+                    throw new UnauthorizedAccessException("You don't have access");
+                }
+
+                var result = await _mediator.Send(command, token);
+                return StatusCode(201, result);
+            }
+            catch (InvalidOperationException ex)
+            {
+                _logger.LogWarning(ex, "Validation error: {Id}", command.Id);
+                return StatusCode(400, new
+                {
+                    Message = ex.Message
+                });
+            }
+            catch (UnauthorizedAccessException ex)
+            {
+                return Unauthorized(ex.Message);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error deleting tasks: {Id}", command.Id);
+                return StatusCode(500, new
                 {
                     Message = "Unexpected server error"
                 });
