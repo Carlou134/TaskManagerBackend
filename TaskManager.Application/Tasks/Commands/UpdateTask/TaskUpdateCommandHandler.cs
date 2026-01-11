@@ -22,6 +22,11 @@ namespace TaskManager.Application.Tasks.Commands.UpdateTask
                 throw new UnauthorizedAccessException("Invalid task");
             }
 
+            if(request.UserId != updateTask.UserId)
+            {
+                throw new UnauthorizedAccessException("You don't have access");
+            }
+
             updateTask.Name = request.Name;
             updateTask.Description = request.Description;
             updateTask.IsCompleted = request.IsCompleted;

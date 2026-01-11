@@ -1,5 +1,4 @@
-﻿
-using MediatR;
+﻿using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
@@ -27,17 +26,13 @@ namespace TaskManager.Api.Controllers
         }
 
         [Authorize(Roles = "USER")]
-        [HttpGet("list/{id}")]
-        public async Task<ActionResult> ListTasks([FromRoute] int id)
+        [HttpGet("list")]
+        public async Task<ActionResult> ListTasks()
         {
             try
             {
-                if(id == GetCurrentUserId())
-                {
-                    return Ok(await _taskQueryService.GetAllTasks(id));
-                }
-
-                return Unauthorized("You don't have access");
+                var id = GetCurrentUserId();
+                return Ok(await _taskQueryService.GetAllTasks(id));
             }
             catch (Exception ex)
             {
@@ -51,6 +46,7 @@ namespace TaskManager.Api.Controllers
         {
             try
             {
+                command.UserId = GetCurrentUserId();
                 var result = await _mediator.Send(command, token);
                 return StatusCode(201, result);
             }
@@ -78,11 +74,7 @@ namespace TaskManager.Api.Controllers
         {
             try
             {
-                if(command.UserId != GetCurrentUserId())
-                {
-                    throw new UnauthorizedAccessException("You don't have access");
-                }
-
+                command.UserId = GetCurrentUserId();
                 var result = await _mediator.Send(command, token);
                 return StatusCode(201, result);
             }
@@ -114,13 +106,9 @@ namespace TaskManager.Api.Controllers
         {
             try
             {
-                if (command.UserId != GetCurrentUserId())
-                {
-                    throw new UnauthorizedAccessException("You don't have access");
-                }
-
+                command.UserId = GetCurrentUserId();
                 var result = await _mediator.Send(command, token);
-                return StatusCode(201, result);
+                return Ok(result);
             }
             catch (InvalidOperationException ex)
             {
