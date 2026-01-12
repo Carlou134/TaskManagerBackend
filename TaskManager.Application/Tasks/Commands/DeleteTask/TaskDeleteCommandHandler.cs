@@ -22,6 +22,11 @@ namespace TaskManager.Application.Tasks.Commands.DeleteTask
                 throw new UnauthorizedAccessException("Invalid task");
             }
 
+            if (request.UserId != deleteTask.UserId)
+            {
+                throw new UnauthorizedAccessException("You don't have access");
+            }
+
             _context.Remove(deleteTask);
             await _context.SaveChangesAsync(cancellationToken);
 
