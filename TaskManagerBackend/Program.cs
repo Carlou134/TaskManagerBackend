@@ -52,6 +52,20 @@ builder.Services.AddMediatR(cfg =>
 builder.Services.AddScoped<IUserQueryService, UserQueryService>();
 builder.Services.AddScoped<ITaskQueryService, TaskQueryService>();
 
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowAngularApp", policy =>
+    {
+        policy
+            .WithOrigins(
+                "http://localhost:4200"
+            )
+            .AllowAnyHeader()
+            .AllowAnyMethod()
+            .AllowCredentials();
+    });
+});
+
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
@@ -67,6 +81,7 @@ if (app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 
+app.UseCors("AllowAngularApp");
 app.UseAuthentication();
 app.UseAuthorization();
 
